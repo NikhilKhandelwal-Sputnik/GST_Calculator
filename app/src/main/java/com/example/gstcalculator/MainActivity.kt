@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.example.gstcalculator.ui.theme.GSTCalculatorTheme
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(35)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -56,8 +57,7 @@ class Item(var name: String = "", var price: Double = 0.0, var quantity: Int = 0
 
 @RequiresApi(35)
 @Composable
-fun GSTCalcLayout(modifier: Modifier = Modifier
-    .fillMaxSize()
+fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 ) {
     var listItems by remember {mutableStateOf(mutableListOf<Item>())}
     Column (modifier = Modifier
@@ -151,6 +151,7 @@ fun totalPrice(price:Double = 0.0, quantity:Int = 0):Double{
     return price * quantity
 }
 
+@RequiresApi(35)
 @Preview(showBackground = true,
     showSystemUi = true)
 @Composable
