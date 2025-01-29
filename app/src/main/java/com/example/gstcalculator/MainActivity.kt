@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -50,7 +51,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-class Item(var name: String = "", var price: Double = 0.0, var quantity: Int = 0){
+class Item(var name: String = "" , var price: Double = 0.0, var quantity: Int = 0){
 
 }
 
@@ -60,6 +61,7 @@ class Item(var name: String = "", var price: Double = 0.0, var quantity: Int = 0
 fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 ) {
     var listItems by remember {mutableStateOf(mutableListOf<Item>())}
+
     Column (modifier = Modifier
         .fillMaxSize()
         .statusBarsPadding()
@@ -67,6 +69,7 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
         .background(color = Color.Gray),
         horizontalAlignment = Alignment.CenterHorizontally
         ){
+        Text(text = listItems.size.toString())
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -83,7 +86,7 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
             IconButton(
                 onClick = {
                     val newItem = Item()
-                    listItems.add(newItem)
+                    listItems = (listItems + newItem).toMutableList()
                 },
                 content = {
                     Icon(imageVector = Icons.Filled.Add, contentDescription = null,)
@@ -98,8 +101,50 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 
         ){
 
-            items(listItems){
-                addItem(it)
+            items(listItems){product ->
+
+                var itemName by remember {mutableStateOf(product.name)}
+                var itemPrice by remember {mutableStateOf(product.price)}
+                var itemQty by remember {mutableStateOf(product.quantity)}
+
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextField(
+                            value = itemName,
+                            onValueChange = { itemName = it },
+                            modifier = Modifier.fillMaxWidth(0.65f)
+                                .weight(1f)
+
+                        )
+                        Text(text = totalPrice(product.price, product.quantity).toString())
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextField(
+                            value = itemPrice.toString(),
+                            onValueChange = { itemPrice = it.toDoubleOrNull()?:0.0
+                            }
+
+                        )
+                        TextField(
+                            value = itemQty.toString(),
+                            onValueChange = { itemQty = it.toIntOrNull()?:0 }
+
+                        )
+                    }
+
+                }
             }
         }
 
@@ -108,44 +153,7 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 
 
 
-@Composable
-fun addItem(item: Item) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = item.name,
-                onValueChange = { item.name = it }
 
-            )
-            Text(text = totalPrice(item.price, item.quantity).toString())
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            TextField(
-                value = item.price.toString(),
-                onValueChange = { item.price = it.toDoubleOrNull()?:0.0 }
-
-            )
-            TextField(
-                value = item.quantity.toString(),
-                onValueChange = { item.quantity = it.toIntOrNull()?:0 }
-
-            )
-        }
-
-    }
-}
 
 fun totalPrice(price:Double = 0.0, quantity:Int = 0):Double{
     return price * quantity
