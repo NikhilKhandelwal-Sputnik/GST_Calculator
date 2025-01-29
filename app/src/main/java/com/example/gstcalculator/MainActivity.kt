@@ -69,7 +69,6 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
         .background(color = Color.Gray),
         horizontalAlignment = Alignment.CenterHorizontally
         ){
-        Text(text = listItems.size.toString())
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -146,6 +145,12 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 
                 }
             }
+        }
+
+        Row {
+            Text(
+                text = "Total Items = ${listItems.size}"
+            )
         }
 
     }
