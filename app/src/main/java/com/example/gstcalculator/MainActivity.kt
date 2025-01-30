@@ -117,11 +117,12 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
                         TextField(
                             value = itemName,
                             onValueChange = { itemName = it },
-                            modifier = Modifier.fillMaxWidth(0.65f)
+                            modifier = Modifier
+                                .fillMaxWidth(0.65f)
                                 .weight(1f)
 
                         )
-                        Text(text = totalPrice(product.price, product.quantity).toString())
+                        Text(text = itemTotalPrice(product.price, product.quantity).toString())
                     }
                     Row(
                         modifier = Modifier
@@ -147,9 +148,20 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
             }
         }
 
-        Row {
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Total Items = ${listItems.size}"
+                )
+
+                Text(text = "Total Price = ${listTotalPrice(listItems)}")
+            }
+
             Text(
-                text = "Total Items = ${listItems.size}"
+                text = "Total GST = "
             )
         }
 
@@ -160,8 +172,20 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 
 
 
-fun totalPrice(price:Double = 0.0, quantity:Int = 0):Double{
+fun itemTotalPrice(price:Double = 0.0, quantity:Int = 0):Double{
     return price * quantity
+}
+
+fun listTotalPrice(productList : MutableList<Item>) : Double{
+    var sum = 0.0
+    for(i in productList){
+        sum += i.price
+    }
+    return sum
+}
+
+fun totalGST(){
+
 }
 
 @RequiresApi(35)
