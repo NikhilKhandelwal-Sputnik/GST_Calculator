@@ -6,22 +6,27 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -29,6 +34,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +67,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-class Item(var name: String = "" , var price: String = "", var quantity: String = ""){
+class Item(var name: String = "" , var price: String = "", var quantity: String = "", var totalPrice: String = ""){
+
 
 }
 
@@ -99,14 +107,16 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
                     listItems = (listItems + newItem).toMutableList()
                 },
                 content = {
-                    Icon(imageVector = Icons.Filled.Add, contentDescription = null,)
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = null)
                 }
             )
         }
         LazyColumn(
             modifier = Modifier
+                .padding(4.dp)
                 .fillMaxWidth()
                 .weight(1f)
+//                .verticalScroll(state = ScrollState(0) ,enabled = true)
 //                .background(Color.White)
 
         ){
@@ -116,19 +126,30 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
                 var itemName by remember {mutableStateOf(product.name)}
                 var itemPrice by remember {mutableStateOf(product.price)}
                 var itemQty by remember {mutableStateOf(product.quantity)}
-                val itemTotal = itemTotalPrice(itemPrice, itemQty)
+                var itemTotal = itemTotalPrice(itemPrice, itemQty)
+                product.totalPrice = itemTotal
+                product.name = itemName
+                product.price = itemPrice
+                product.quantity = itemQty
 
-                Column {
+                val txtFieldColor = TextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
+
+
+                Column (modifier = Modifier
+                    .background(color = Color.LightGray)
+                    .padding(8.dp)
+                ){
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(10.dp),
+                            .padding(2.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
                             value = itemName,
                             onValueChange = { itemName = it },
+                            colors = txtFieldColor,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Text,
                                 imeAction = ImeAction.Next
@@ -138,16 +159,22 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
                                 .weight(1f)
 
                         )
+
+                        Spacer(modifier = Modifier.fillMaxWidth(0.1f))
+
                         Text(
                             text = itemTotal,
-                            color = Color.White,
-                            modifier = Modifier.fillMaxWidth(0.3f))
+                            color = Color.Black,
+                            modifier = Modifier.fillMaxWidth(0.3f)
+                                .background(color = Color.White)
+                                .height(48.dp)
+                        )
                     }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(10.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                            .padding(2.dp),
+                        horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextField(
@@ -155,29 +182,54 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
                             onValueChange = { itemPrice = it
                                 product.price = itemPrice
                             },
+                            colors = txtFieldColor,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Decimal,
                                 imeAction = ImeAction.Next
-                                )
-
+                                ),
+//                            modifier = Modifier.fillMaxWidth(0.4f)
+//
                         )
+
+                        Spacer(modifier = Modifier.fillMaxWidth(0.1f))
+
                         TextField(
-                            value = itemQty.toString(),
+                            value = itemQty,
                             onValueChange = { itemQty = it
                                             product.quantity = itemQty
                                             },
+                            colors = txtFieldColor,
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Decimal,
                                 imeAction = ImeAction.Done
-                            )
+                            ),
+//                            modifier = Modifier.fillMaxWidth(0.4f)
                         )
                     }
 
                 }
+                Spacer(Modifier.height(2.dp))
             }
         }
 
         Column {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                IconButton(
+                    onClick = {},
+                    modifier= Modifier.border(width = 1.dp, color = Color.Black)
+                        .padding(horizontal = 4.dp, vertical = 0.dp)
+                ) {
+                    Text(
+                        text = "OK",
+                        fontSize = 20.sp,
+                        modifier = Modifier.padding(0.dp)
+                    )
+                }
+
+            }
             totalRow(listParam = listItems, rowType = "items", datField = "${listItems.size}")
             totalRow(listParam = listItems, rowType = "price", datField = "${listTotalPrice(listItems)}")
 
@@ -192,14 +244,16 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 fun totalRow(listParam: MutableList<Item>,  rowType: String, datField:String, fSize: Int = 24){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(16.dp, 8.dp)
             .border(width = 1.dp, color = Color.Black)
     ) {
         Text(
             text = "Total ${rowType.replaceFirstChar{it.titlecase(Locale.getDefault())}}",
             fontSize = fSize.sp,
-            modifier = Modifier.border(width = 1.dp, color = Color.Black)
+            modifier = Modifier
+                .border(width = 1.dp, color = Color.Black)
                 .fillMaxWidth(0.6f)
                 .padding(horizontal = 4.dp)
         )
@@ -208,7 +262,8 @@ fun totalRow(listParam: MutableList<Item>,  rowType: String, datField:String, fS
             text = datField,
             fontSize = fSize.sp,
             textAlign = TextAlign.End,
-            modifier = Modifier.border(width = 1.dp, color = Color.Black)
+            modifier = Modifier
+                .border(width = 1.dp, color = Color.Black)
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp)
                 .weight(1f)
@@ -224,7 +279,7 @@ fun itemTotalPrice(price:String, quantity:String ):String{
 fun listTotalPrice(productList : MutableList<Item>) : Double{
     var sum = 0.0
     for(i in productList){
-        sum += i.price.toDoubleOrNull()?:0.0
+        sum += (i.totalPrice.toDoubleOrNull() ?: 0.0)
     }
     return sum
 }
