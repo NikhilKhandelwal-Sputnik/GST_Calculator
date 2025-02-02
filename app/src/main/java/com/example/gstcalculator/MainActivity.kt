@@ -67,17 +67,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-class Item(var name: String = "" , var price: String = "", var quantity: String = "", var totalPrice: String = ""){
-
-
-}
+class Item(var name: String = "" , var price: String = "", var quantity: String = "", var totalPrice: String = "")
 
 
 @RequiresApi(35)
 @Composable
-fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
-
-) {
+fun GSTCalcLayout() {
     var listItems by remember {mutableStateOf(mutableListOf<Item>())}
 
     Column (modifier = Modifier
@@ -123,91 +118,8 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 
             items(listItems){product ->
 
-                var itemName by remember {mutableStateOf(product.name)}
-                var itemPrice by remember {mutableStateOf(product.price)}
-                var itemQty by remember {mutableStateOf(product.quantity)}
-                var itemTotal = itemTotalPrice(itemPrice, itemQty)
-                product.totalPrice = itemTotal
-                product.name = itemName
-                product.price = itemPrice
-                product.quantity = itemQty
+                ProductDisplay(product)
 
-                val txtFieldColor = TextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White)
-
-
-                Column (modifier = Modifier
-                    .background(color = Color.LightGray)
-                    .padding(8.dp)
-                ){
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(2.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextField(
-                            value = itemName,
-                            onValueChange = { itemName = it },
-                            colors = txtFieldColor,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Text,
-                                imeAction = ImeAction.Next
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth(0.65f)
-                                .weight(1f)
-
-                        )
-
-                        Spacer(modifier = Modifier.fillMaxWidth(0.1f))
-
-                        Text(
-                            text = itemTotal,
-                            color = Color.Black,
-                            modifier = Modifier.fillMaxWidth(0.3f)
-                                .background(color = Color.White)
-                                .height(48.dp)
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(2.dp),
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextField(
-                            value = itemPrice.toString(),
-                            onValueChange = { itemPrice = it
-                                product.price = itemPrice
-                            },
-                            colors = txtFieldColor,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Decimal,
-                                imeAction = ImeAction.Next
-                                ),
-//                            modifier = Modifier.fillMaxWidth(0.4f)
-//
-                        )
-
-                        Spacer(modifier = Modifier.fillMaxWidth(0.1f))
-
-                        TextField(
-                            value = itemQty,
-                            onValueChange = { itemQty = it
-                                            product.quantity = itemQty
-                                            },
-                            colors = txtFieldColor,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Decimal,
-                                imeAction = ImeAction.Done
-                            ),
-//                            modifier = Modifier.fillMaxWidth(0.4f)
-                        )
-                    }
-
-                }
                 Spacer(Modifier.height(2.dp))
             }
         }
@@ -218,7 +130,12 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
                 modifier = Modifier.fillMaxWidth()
             ){
                 IconButton(
-                    onClick = {},
+                    onClick = {
+                        val tempItem = Item()
+                        listItems = (listItems+ tempItem).toMutableList()
+                        val i = listItems.lastIndex
+                        listItems.removeAt(i)
+                    },
                     modifier= Modifier.border(width = 1.dp, color = Color.Black)
                         .padding(horizontal = 4.dp, vertical = 0.dp)
                 ) {
@@ -230,10 +147,10 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
                 }
 
             }
-            totalRow(listParam = listItems, rowType = "items", datField = "${listItems.size}")
-            totalRow(listParam = listItems, rowType = "price", datField = "${listTotalPrice(listItems)}")
+            TotalRow(listParam = listItems, rowType = "items", datField = "${listItems.size}")
+            TotalRow(listParam = listItems, rowType = "price", datField = "${listTotalPrice(listItems)}")
 
-            totalRow(listParam = listItems, rowType = "GST", datField = "${totalGST()}", fSize = 32)
+            TotalRow(listParam = listItems, rowType = "GST", datField = "${totalGST()}", fSize = 32)
         }
 
     }
@@ -241,7 +158,7 @@ fun GSTCalcLayout(modifier: Modifier = Modifier.fillMaxSize()
 
 
 @Composable
-fun totalRow(listParam: MutableList<Item>,  rowType: String, datField:String, fSize: Int = 24){
+fun TotalRow(listParam: MutableList<Item>,  rowType: String, datField:String, fSize: Int = 24){
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -268,6 +185,95 @@ fun totalRow(listParam: MutableList<Item>,  rowType: String, datField:String, fS
                 .padding(horizontal = 4.dp)
                 .weight(1f)
         )
+    }
+}
+
+@Composable
+fun ProductDisplay(product: Item){
+    var itemName by remember {mutableStateOf(product.name)}
+    var itemPrice by remember {mutableStateOf(product.price)}
+    var itemQty by remember {mutableStateOf(product.quantity)}
+    val itemTotal = itemTotalPrice(itemPrice, itemQty)
+    product.totalPrice = itemTotal
+    product.name = itemName
+    product.price = itemPrice
+    product.quantity = itemQty
+
+    val txtFieldColor = TextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, focusedTextColor = Color.Black, unfocusedTextColor = Color.Black)
+
+
+    Column (modifier = Modifier
+        .background(color = Color.LightGray)
+        .padding(8.dp)
+    ){
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = itemName,
+                onValueChange = { itemName = it },
+                colors = txtFieldColor,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                ),
+                modifier = Modifier
+                    .fillMaxWidth(0.65f)
+                    .weight(1f)
+
+            )
+
+            Spacer(modifier = Modifier.fillMaxWidth(0.1f))
+
+            Text(
+                text = itemTotal,
+                color = Color.Black,
+                modifier = Modifier.fillMaxWidth(0.3f)
+                    .background(color = Color.White)
+                    .height(48.dp)
+            )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(2.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = itemPrice,
+                onValueChange = { itemPrice = it
+                    product.price = itemPrice
+                },
+                colors = txtFieldColor,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                ),
+//                            modifier = Modifier.fillMaxWidth(0.4f)
+//
+            )
+
+            Spacer(modifier = Modifier.fillMaxWidth(0.1f))
+
+            TextField(
+                value = itemQty,
+                onValueChange = { itemQty = it
+                    product.quantity = itemQty
+                },
+                colors = txtFieldColor,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done
+                ),
+//                            modifier = Modifier.fillMaxWidth(0.4f)
+            )
+        }
+
     }
 }
 
