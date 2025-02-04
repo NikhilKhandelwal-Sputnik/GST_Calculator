@@ -199,7 +199,7 @@ fun ProductDisplay(product: Item){
     product.price = itemPrice
     product.quantity = itemQty
 
-    val txtFieldColor = TextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, focusedTextColor = Color.Black, unfocusedTextColor = Color.Black)
+    val txtFieldColor = TextFieldDefaults.colors(focusedContainerColor = Color.White, unfocusedContainerColor = Color.Transparent, focusedTextColor = Color.Black, unfocusedTextColor = Color.Black)
 
 
     Column (modifier = Modifier
